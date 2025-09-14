@@ -7,8 +7,6 @@ https://kursovayamax1.yonote.ru/doc/test-plan-proekta-Gr1owBBJn5
 Описание проекта
 Данный проект содержит набор автоматизированных тестов для интернет-магазина книг "Читай-город". Тесты охватывают как функциональность API, так и пользовательский интерфейс (UI), обеспечивая надежное тестирование различных операций, таких как добавление, обновление и удаление товаров из корзины, а также тестирование функциональности поиска.
 
-Структура проекта
-Chitai-gorod │ ├── pages │ ├── Add_To_Cart_api.py │ ├── Add_To_Cart_ui.py │ ├── Delete_From_Cart_api.py │ ├── Delete_From_Cart_ui.py │ ├── Search_By_Author_ui.py │ ├── Search_By_Title_ui.py │ ├── Send_Empty_Post_Request_api.py │ ├── Update_cart_api.py │ └── Wrong_Request_api.py │ ├── tests │ ├── test_api.py │ └── test_ui.py │ ├── constants.py ├── README.md └── .gitignore
 
 Описание классов
 pages/: Папка, содержащая классы для работы с API и UI.
