@@ -23,26 +23,38 @@ def test_search_by_author():
                       Проверка корректности результатов поиска по автору.
 
     """
-    with allure.step("Запустить браузер Chrome"):
-        driver = webdriver.Chrome()
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+import allure
 
+with allure.step("Запустить браузер Chrome"):
+    driver = webdriver.Chrome()
+
+try:
     with allure.step("Перейти на сайт Читай-город"):
         driver.get(UI_url)
 
-    with allure.step("Найти книгу по автору Булгаков Михаил Афанасьевич"):
+    with allure.step("Найти книги по автору Булгаков Михаил Афанасьевич"):
         author_name = "Михаил Афанасьевич"
         search_by_author(author_name)
+        allure.attach(f"Искомый автор: {author_name}", name="Параметры поиска")
 
-    with allure.step("Получить результаты поиска"):
-        results_find = driver.find_element(By.CLASS_NAME,
-                                           "product-card__subtitle")
+    with allure.step("Получить и проверить результаты поиска"):
+        results = WebDriverWait(driver, 10).until(
+            EC.presence_of_all_elements_located((By.CLASS_NAME, "product-card__subtitle"))
+        )
+        
+        allure.attach(f"Найдено результатов: {len(results)}", name="Количество книг")
+        assert len(results) > 0, f"Не найдено книг автора {author_name}"
+        
+        # Проверяем наличие автора в первых трех результатах
+        authors_found = [result.text for result in results[:3]]
+        assert any(author_name.lower() in author.lower() for author in authors_found), \
+               f"Автор {author_name} не найден в результатах: {authors_found}"
 
-    with allure.step("Проверить, что поиск по автору успешен"):
-        assert results_find is not None
-
+finally:
     with allure.step("Закрыть браузер"):
         driver.quit()
-
 
 @allure.title("Тест добавления товара в корзину. POSITIVE")
 @allure.description("Этот тест проверяет, что товар добавляется в корзину.")
