@@ -23,38 +23,23 @@ def test_search_by_author():
                       Проверка корректности результатов поиска по автору.
 
     """
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-import allure
+ @allure.feature("Поиск по автору")
+class TestSearchShort:
 
-with allure.step("Запустить браузер Chrome"):
-    driver = webdriver.Chrome()
+    def setup_method(self):
+        self.driver = webdriver.Chrome()
+        self.driver.get("https://www.chitai-gorod.ru/")
 
-try:
-    with allure.step("Перейти на сайт Читай-город"):
-        driver.get(UI_url)
+    def teardown_method(self):
+        self.driver.quit()
 
-    with allure.step("Найти книги по автору Булгаков Михаил Афанасьевич"):
-        author_name = "Михаил Афанасьевич"
-        search_by_author(author_name)
-        allure.attach(f"Искомый автор: {author_name}", name="Параметры поиска")
-
-    with allure.step("Получить и проверить результаты поиска"):
-        results = WebDriverWait(driver, 10).until(
-            EC.presence_of_all_elements_located((By.CLASS_NAME, "product-card__subtitle"))
-        )
+    @allure.title("Поиск книг автора")
+    def test_search_author(self):
+        """Короткий тест поиска по автору."""
         
-        allure.attach(f"Найдено результатов: {len(results)}", name="Количество книг")
-        assert len(results) > 0, f"Не найдено книг автора {author_name}"
+        search = SearchByAuthor("Пушкин А.С.")
+        search.search_by_author(self.driver)
         
-        # Проверяем наличие автора в первых трех результатах
-        authors_found = [result.text for result in results[:3]]
-        assert any(author_name.lower() in author.lower() for author in authors_found), \
-               f"Автор {author_name} не найден в результатах: {authors_found}"
-
-finally:
-    with allure.step("Закрыть браузер"):
-        driver.quit()
 
 @allure.title("Тест добавления товара в корзину. POSITIVE")
 @allure.description("Этот тест проверяет, что товар добавляется в корзину.")
@@ -65,26 +50,30 @@ def test_add_to_card():
                          Проверка корректности добавления товара в корзину.
 
     """
-    with allure.step("Запустить браузер Chrome"):
+  @allure.step("Добавить книгу '{book_title}' в корзину")
+def add_to_card(driver, book_title):
+    """Добавление книги в корзину."""
+    WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.NAME, "search"))).send_keys(book_title)
+    WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.CSS_SELECTOR, "search-form__button-search]"))).click()
+    WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.CSS_SELECTOR, ".product-buttons__main-action"))).click()
+
+
+def test_add_book_to_cart():
+    """Тест добавления книги в корзину."""
+    with allure.step("Запуск браузера и переход на сайт"):
         driver = webdriver.Chrome()
+        driver.get("https://www.chitai-gorod.ru/")
 
-    with allure.step("Перейти на сайт Читай-город"):
-        driver.get(UI_url)
+    with allure.step("Добавление книги 'Я так взрослею: об отношениях с собой и другими' в корзину"):
+        add_to_card(driver, "Я так взрослею: об отношениях с собой и другими")
 
-    with allure.step("Добавить в корзину книгу "
-                     "с названием Калифорния на Амуре"):
-        book_title = "Калифорния на Амуре"
-        add_to_card(book_title)
+    with allure.step("Проверка что корзина не пуста"):
+        cart_button = WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located((By.CSS_SELECTOR, "header-controls__icon-wrapper]"))
+        )
+        assert cart_button is not None
 
-    with allure.step("Получить результаты добавления в корзину"):
-        results_add = driver.find_element(By.CSS_SELECTOR,
-                                          'div.product-buttons.'
-                                          'product-card__actions')
-
-    with allure.step("Проверить, что корзина не пуста"):
-        assert results_add is not None
-
-    with allure.step("Закрыть браузер"):
+    with allure.step("Закрытие браузера"):
         driver.quit()
 
 

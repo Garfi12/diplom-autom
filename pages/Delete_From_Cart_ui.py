@@ -32,7 +32,7 @@ class DeleteFromCart:
 
         # Клик по кнопке поиска
         search_button_find = driver.find_element(By.CSS_SELECTOR,
-                                                 "button[aria-label='Найти']")
+                                                 "search-form__button-search")
         search_button_find.click()
 
         # Клик по кнопке "Купить"

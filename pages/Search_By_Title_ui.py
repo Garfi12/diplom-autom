@@ -34,7 +34,7 @@ class SearchByTitle:
 
             # Клик по кнопке поиска
             search_button = driver.find_element(By.CSS_SELECTOR,
-                                                "button[aria-label='Найти']")
+                                                "search-form__icon-search")
             search_button.click()
         except Exception as e:
             allure.attach(str(e), name="error",
